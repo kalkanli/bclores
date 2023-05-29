@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
 		ReportsModule,
 		TypeOrmModule.forRoot({
 			type : "sqlite",
-			database: "../clores.db",
+			database: "clores.db",
 			entities: [Report],
 			synchronize: true
 		  }),
