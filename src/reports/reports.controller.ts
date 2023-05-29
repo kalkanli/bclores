@@ -1,13 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ReportsService } from './reports.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+
+const editFileName = (req, file, callback) => {
+	const name = file.originalname.split('.')[0];
+	callback(null, `${name}.xlsx`);
+  };
 
 @Controller('reports')
 export class ReportsController {
 	constructor(private readonly reportsService: ReportsService) { }
 
-	@Get()
-	async create() {
-		await this.reportsService.processExcel()
+	@Post('/upload')
+	@UseInterceptors(FileInterceptor('file', {
+		storage: diskStorage({
+			destination: './uploads/',
+			filename: editFileName
+		}),
+	}))
+	async create(@Body() request, @UploadedFile() file: Express.Multer.File) {
+		this.reportsService.processExcel(file.filename, request.semester, request.instructor, request.courseCode )
+		return 200;
 	}
 
 	@Get(':semester')
