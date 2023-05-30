@@ -11,7 +11,7 @@ import { PythonShell } from 'python-shell';
 export class ReportsService {
 	constructor(@InjectRepository(Report) private reportRepository: Repository<Report>) { }
 
-	public async processExcel(): Promise<void> {
+	public async processExcel(fileName, semester, instructor, course): Promise<void> {
 		const report = new Report(
 			'../clores/2021-SPRING-CMPE230-clo-pc-data.xlsx',
 			'2020-FALL',
