@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { CreateLatexDTO } from './dtos/create-latex.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
