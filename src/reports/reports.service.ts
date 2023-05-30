@@ -9,7 +9,7 @@ import { CLO } from './entities/clo.entity';
 export class ReportsService {
 	constructor(@InjectRepository(Report) private reportRepository: Repository<Report>) { }
 
-	public async processExcel(): Promise<void> {
+	public async processExcel(fileName, semester, instructor, course): Promise<void> {
 		const report = new Report(
 			'2020-FALL-CMPE230-clo-pc-data.xlsx',
 			'2020-FALL',
@@ -25,17 +25,17 @@ export class ReportsService {
 	}
 
 	public async getReports(course: string) {
-		return await this.reportRepository.find({where: {course: course}})
+		return await this.reportRepository.find({ where: { course: course } })
 	}
 
 	public async calculateCollectiveCLOs(semester: string) {
-		const reports = await this.reportRepository.find({where: {semester: semester}});
-		
+		const reports = await this.reportRepository.find({ where: { semester: semester } });
+
 		const PCPrefix = ["(1,9)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)", "(10)", "(11)"]
 		const PCs = Array.apply(null, Array(65)).map(() => []);
 		const PCsAverage = Array.apply(null, Array(65)).map(() => 0);
 		const cumPCCounts = [0, 5, 9, 16, 27, 32, 37, 42, 44, 59];
-		
+
 		const CLOs = Array.apply(null, Array(11)).map(() => []);
 		const CLOsAverage = Array.apply(null, Array(11)).map(() => 0);
 
@@ -45,7 +45,7 @@ export class ReportsService {
 			for (let i = 0; i < clo.gradeCLOs.length; i++) {
 				let relatedSOs = clo.relatedSOs[i];
 				for (let j = 0; j < relatedSOs.length; j++) {
-					CLOs[parseInt(relatedSOs[j])-1].push(clo.gradeCLOs[i]);
+					CLOs[parseInt(relatedSOs[j]) - 1].push(clo.gradeCLOs[i]);
 				}
 			}
 
