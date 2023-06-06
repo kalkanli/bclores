@@ -6,18 +6,23 @@ import { PC } from './entities/pc.entity';
 import { CLO } from './entities/clo.entity';
 import { CreateLatexDTO } from './dtos/create-latex.dto';
 import { PythonShell } from 'python-shell';
+const crypto = require('crypto');
+const fs = require('fs');
 
 @Injectable()
 export class ReportsService {
 	constructor(@InjectRepository(Report) private reportRepository: Repository<Report>) { }
 
 	public async processExcel(fileName, semester, instructor, course): Promise<void> {
+		const file = fs.readFileSync('../clores/2021-SPRING-CMPE230-clo-pc-data.xlsx');
+		const checksum = crypto.createHash('md5').update(file).digest("hex");
 		const report = new Report(
 			fileName,
 			semester,
 			instructor,
 			course,
-			'pending'
+			'pending',
+			checksum
 		);
 		report.parseExcelFile()
 		await this.reportRepository.save(report)
@@ -124,5 +129,9 @@ export class ReportsService {
 			ids: reportIds,
 			report: results.join('\n')
 		}
+	}
+
+	public async timestampReport(id: number): Promise<void> {
+		
 	}
 }

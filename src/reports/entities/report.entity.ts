@@ -10,12 +10,14 @@ export class Report {
         semester: string,
         instructor: string,
         course: string,
-        status: string = 'pending'
+        status: string = 'pending',
+        checksum: string
     ) {
         this.semester = semester;
         this.instructor = instructor;
         this.course = course;
         this.status = status;
+        this.checksum = checksum;
     }
 
     @PrimaryGeneratedColumn()
@@ -29,6 +31,8 @@ export class Report {
     instructor: string;
     @Column()
     status: string;
+    @Column({nullable: true})
+    checksum?: string;
     
     private N: number;
 

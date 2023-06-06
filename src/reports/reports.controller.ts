@@ -13,6 +13,12 @@ const editFileName = (req, file, callback) => {
 export class ReportsController {
 	constructor(private readonly reportsService: ReportsService) { }
 
+
+	@Post('/test')
+	async test(): Promise<void> {
+		return await this.reportsService.processExcel('','','','')
+	}
+
 	@Post('/upload')
 	@UseInterceptors(FileInterceptor('file', {
 		storage: diskStorage({
@@ -38,5 +44,10 @@ export class ReportsController {
 	@Post('/latex')
 	async getReportAsLatex(@Body() dto: CreateLatexDTO) {
 		return await this.reportsService.createLatexReport(dto);
+	}
+
+	@Post('timestamp/:id')
+	async timestampReport(@Param('id') id: number) {
+		return await this.reportsService.timestampReport(id);
 	}
 }
