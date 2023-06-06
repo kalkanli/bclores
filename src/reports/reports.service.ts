@@ -13,10 +13,11 @@ export class ReportsService {
 
 	public async processExcel(fileName, semester, instructor, course): Promise<void> {
 		const report = new Report(
-			'../clores/2021-SPRING-CMPE230-clo-pc-data.xlsx',
-			'2020-FALL',
-			'OZTURAN',
-			'CMPE230'
+			fileName,
+			semester,
+			instructor,
+			course,
+			'pending'
 		);
 		report.parseExcelFile()
 		await this.reportRepository.save(report)
@@ -26,8 +27,13 @@ export class ReportsService {
 		// TODO: implement
 	}
 
-	public async getReports(course: string) {
-		return await this.reportRepository.find({ where: { course: course } })
+	public async getReports(semester: string) {
+		if (!semester){
+			return await this.reportRepository.find();
+		} else {
+			console.log(await this.reportRepository.find({ where: { semester: semester } }))
+			return await this.reportRepository.find({ where: { semester: semester } })
+		}
 	}
 
 	public async calculateCollectiveCLOs(semester: string) {

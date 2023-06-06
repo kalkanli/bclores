@@ -7,7 +7,7 @@ import { diskStorage } from 'multer';
 const editFileName = (req, file, callback) => {
 	const name = file.originalname.split('.')[0];
 	callback(null, `${name}.xlsx`);
-  };
+};
 
 @Controller('reports')
 export class ReportsController {
@@ -21,7 +21,7 @@ export class ReportsController {
 		}),
 	}))
 	async create(@Body() request, @UploadedFile() file: Express.Multer.File) {
-		this.reportsService.processExcel(file.filename, request.semester, request.instructor, request.courseCode )
+		this.reportsService.processExcel(file.filename, request.semester, request.instructor, request.courseCode)
 		return 200;
 	}
 

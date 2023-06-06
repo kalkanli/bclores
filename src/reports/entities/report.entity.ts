@@ -9,11 +9,13 @@ export class Report {
         public path: string,
         semester: string,
         instructor: string,
-        course: string
+        course: string,
+        status: string = 'pending'
     ) {
         this.semester = semester;
         this.instructor = instructor;
         this.course = course;
+        this.status = status;
     }
 
     @PrimaryGeneratedColumn()
@@ -25,6 +27,8 @@ export class Report {
     course: string; 
     @Column()
     instructor: string;
+    @Column()
+    status: string;
     
     private N: number;
 
