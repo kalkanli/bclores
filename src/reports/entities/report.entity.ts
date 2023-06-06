@@ -9,11 +9,13 @@ export class Report {
         public path: string,
         semester: string,
         instructor: string,
-        course: string
+        course: string,
+        checksum: string
     ) {
         this.semester = semester;
         this.instructor = instructor;
         this.course = course;
+        this.checksum = checksum;
     }
 
     @PrimaryGeneratedColumn()
@@ -25,6 +27,8 @@ export class Report {
     course: string; 
     @Column()
     instructor: string;
+    @Column({nullable: true})
+    checksum?: string;
     
     private N: number;
 
