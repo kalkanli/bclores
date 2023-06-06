@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Report } from './entities/report.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PC } from './entities/pc.entity';
 import { CLO } from './entities/clo.entity';
+import { CreateLatexDTO } from './dtos/create-latex.dto';
+import { PythonShell } from 'python-shell';
 
 @Injectable()
 export class ReportsService {
@@ -83,6 +85,44 @@ export class ReportsService {
 		return {
 			clos: CLOsAverage,
 			pcs: PCsAverage
+		}
+	}
+
+	public async createLatexReport(dto: CreateLatexDTO) {
+		let reportType = dto.type;
+		let filter = { semester: In(dto.semesters) }
+		if(dto.courses) {
+			filter['course'] = In(dto.courses);
+		}
+		const reports = await this.reportRepository.find({where: filter});
+		const reportIds = [];
+		let cloresFeed = [];
+		for (let i = 0; i < reports.length; i++) {
+			const report = reports[i];
+			reportIds.push(report.id);
+			cloresFeed.push(`${report.semester}>${report.course}>${report.instructor}`);
+		}
+		const options = {
+			pythonPath: '../clores/env/bin/python3',
+			scriptPath: '../clores/src/',
+			args: [`--`+reportType, `--f1=${dto.semesters.join(',')}`, `--f2=${cloresFeed.join(',')}`]
+		}
+		if (reportType == 'cpc' || reportType == 'cclo') {
+			let years = [];
+			for (let i = 0; i < dto.semesters.length; i++) {
+				let year = dto.semesters[i].split('-')[0];
+				if (!years.includes(year)) years.push(year);
+			}
+			if (years.length != 3) {
+				throw "cannot collective year";
+			}
+			years = [years[0] + '-' + years[1], years[1] + '-' + years[2]];
+			options.args.push('--f3=' + years.join(','));
+		}
+		const results = await PythonShell.run('clores421.py', options);		
+		return {
+			ids: reportIds,
+			report: results.join('\n')
 		}
 	}
 }

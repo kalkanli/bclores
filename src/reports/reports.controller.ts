@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ReportsService } from './reports.service';
+import { CreateLatexDTO } from './dtos/create-latex.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
@@ -32,5 +33,10 @@ export class ReportsController {
 	@Get('/collective/:semester')
 	async getCollectivePCsAndCLOs(@Param('semester') semester: string) {
 		return await this.reportsService.calculateCollectiveCLOs(semester);
+	}
+
+	@Post('/latex')
+	async getReportAsLatex(@Body() dto: CreateLatexDTO) {
+		return await this.reportsService.createLatexReport(dto);
 	}
 }
