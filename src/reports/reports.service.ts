@@ -28,21 +28,29 @@ export class ReportsService {
 		await this.reportRepository.save(report)
 	}
 
-	private async excelHealthCheck(): Promise<void> {
-		// TODO: implement
+	public async getReports() {
+		return await this.reportRepository.find()
 	}
 
-	public async getReports(semester: string) {
-		if (!semester){
-			return await this.reportRepository.find();
-		} else {
-			console.log(await this.reportRepository.find({ where: { semester: semester } }))
-			return await this.reportRepository.find({ where: { semester: semester } })
+	public async getAllCollectiveCLOsAndPCs() {
+		let year = 2020;
+		const results = [];
+		
+		for(let i=0; i<3; i++) {
+			const result = await this.calculateCollectiveCLOsAndPCs(`${year}-${year+1}`);
+			if(result != null) {
+				results.push(result);
+			}
 		}
+		return results;
 	}
 
-	public async calculateCollectiveCLOs(semester: string) {
-		const reports = await this.reportRepository.find({ where: { semester: semester } });
+	public async calculateCollectiveCLOsAndPCs(year: string) {
+		const tokens = year.split('-');
+		const semesters = [`${tokens[0]}-FALL`, `${tokens[1]}-SPRING`];
+
+		const reports = await this.reportRepository.find({ where: { semester: In(semesters) } });
+		if(reports.length == 0) return null;
 
 		const PCPrefix = ["(1,9)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)", "(10)", "(11)"]
 		const PCs = Array.apply(null, Array(65)).map(() => []);
@@ -88,6 +96,7 @@ export class ReportsService {
 		}
 
 		return {
+			year: year,
 			clos: CLOsAverage,
 			pcs: PCsAverage
 		}
@@ -124,14 +133,17 @@ export class ReportsService {
 			years = [years[0] + '-' + years[1], years[1] + '-' + years[2]];
 			options.args.push('--f3=' + years.join(','));
 		}
-		const results = await PythonShell.run('clores421.py', options);		
+		const results = await PythonShell.run('clores421.py', options);
 		return {
 			ids: reportIds,
 			report: results.join('\n')
 		}
 	}
 
-	public async timestampReport(id: number): Promise<void> {
-		
+	public async timestampReport(id: number, txID: string): Promise<void> {
+		const report = await this.reportRepository.findOne({where: {id}});
+		report.status = 'certified';
+		report.txID = txID;
+		await this.reportRepository.save(report);
 	}
 }

@@ -14,9 +14,9 @@ export class ReportsController {
 	constructor(private readonly reportsService: ReportsService) { }
 
 
-	@Post('/test')
-	async test(): Promise<void> {
-		return await this.reportsService.processExcel('','','','')
+	@Get('/collective-reports')
+	async getAllCollectiveResults() {
+		return await this.reportsService.getAllCollectiveCLOsAndPCs();
 	}
 
 	@Post('/upload')
@@ -27,18 +27,13 @@ export class ReportsController {
 		}),
 	}))
 	async create(@Body() request, @UploadedFile() file: Express.Multer.File) {
-		this.reportsService.processExcel(file.filename, request.semester, request.instructor, request.courseCode)
+		await this.reportsService.processExcel(file.filename, request.semester, request.instructor, request.courseCode)
 		return 200;
 	}
 
-	@Get(':semester')
-	async getCourseReports(@Param('semester') semester: string) {
-		return await this.reportsService.getReports(semester);
-	}
-
-	@Get('/collective/:semester')
-	async getCollectivePCsAndCLOs(@Param('semester') semester: string) {
-		return await this.reportsService.calculateCollectiveCLOs(semester);
+	@Get('/all')
+	async getCourseReports() {
+		return await this.reportsService.getReports();
 	}
 
 	@Post('/latex')
@@ -46,8 +41,8 @@ export class ReportsController {
 		return await this.reportsService.createLatexReport(dto);
 	}
 
-	@Post('timestamp/:id')
-	async timestampReport(@Param('id') id: number) {
-		return await this.reportsService.timestampReport(id);
+	@Post('timestamp/:id/:txID')
+	async timestampReport(@Param('id') id: number, @Param('txID') txID: string) {
+		return await this.reportsService.timestampReport(id, txID);
 	}
 }
