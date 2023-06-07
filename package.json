@@ -26,6 +26,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "bcrypt": "^5.1.0",
     "ethers": "^6.4.0",
     "multer": "^1.4.5-lts.1",
     "node-xlsx": "^0.23.0",

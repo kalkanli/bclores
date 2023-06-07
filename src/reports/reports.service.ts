@@ -41,6 +41,7 @@ export class ReportsService {
 			if(result != null) {
 				results.push(result);
 			}
+			year++;
 		}
 		return results;
 	}

@@ -5,6 +5,7 @@ import { ReportsModule } from './reports/reports.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Report } from './reports/entities/report.entity';
 import { AuthModule } from './auth/auth.module';
+import { User } from './auth/entities/user.entity';
 
 @Module({
 	imports: [
@@ -12,7 +13,7 @@ import { AuthModule } from './auth/auth.module';
 		TypeOrmModule.forRoot({
 			type : "sqlite",
 			database: "clores.db",
-			entities: [Report],
+			entities: [Report, User],
 			synchronize: true
 		  }),
 		AuthModule
