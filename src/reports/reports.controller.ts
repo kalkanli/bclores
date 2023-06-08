@@ -22,7 +22,7 @@ export class ReportsController {
 	@Post('/upload')
 	@UseInterceptors(FileInterceptor('file', {
 		storage: diskStorage({
-			destination: './uploads/',
+			destination: './clores/',
 			filename: editFileName
 		}),
 	}))

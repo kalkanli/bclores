@@ -15,11 +15,11 @@ export class ReportsService {
 
 	public async processExcel(fileName, semester, instructor, course): Promise<void> {
 		console.log(fileName)
-		
-		const file = fs.readFileSync('./uploads/' + fileName);
+
+		const file = fs.readFileSync('./clores/' + fileName);
 		const checksum = crypto.createHash('sha256').update(file).digest("hex");
 		const report = new Report(
-			'./uploads/' + fileName,
+			'./clores/' + fileName,
 			semester,
 			instructor,
 			course,
@@ -107,11 +107,17 @@ export class ReportsService {
 
 	public async createLatexReport(dto: CreateLatexDTO) {
 		let reportType = dto.type;
+		console.log(dto)
 		let filter = { semester: In(dto.semesters) }
 		if (dto.courses) {
 			filter['course'] = In(dto.courses);
 		}
+		console.log(filter)
 		const reports = await this.reportRepository.find({ where: filter });
+		console.log(reports.length)
+		if (reports.length == 0)
+			return "";
+
 		const reportIds = [];
 		let cloresFeed = [];
 		for (let i = 0; i < reports.length; i++) {
@@ -119,9 +125,10 @@ export class ReportsService {
 			reportIds.push(report.id);
 			cloresFeed.push(`${report.semester}>${report.course}>${report.instructor}`);
 		}
+
 		const options = {
-			pythonPath: '../clores/env/bin/python3',
-			scriptPath: '../clores/src/',
+			pythonPath: './clores/env/Scripts/python.exe',
+			scriptPath: './clores/src/',
 			args: [`--` + reportType, `--f1=${dto.semesters.join(',')}`, `--f2=${cloresFeed.join(',')}`]
 		}
 		if (reportType == 'cpc' || reportType == 'cclo') {
