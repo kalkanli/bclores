@@ -10,10 +10,10 @@ export class AuthService {
 
 	public async signin(dto: any) {
 		try {
-			const user = await this.userRepository.findOneOrFail({where: {username: dto.username}});
+			const user = await this.userRepository.findOneOrFail({where: {email: dto.username}});
 			const hash = await bcrypt.hash(dto.password, user.salt);
       		if (hash == user.passwordHashed) {
-				return 200;
+				return user;
 			} else {
 				throw new UnauthorizedException();
 			}

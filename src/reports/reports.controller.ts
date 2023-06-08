@@ -43,6 +43,7 @@ export class ReportsController {
 
 	@Post('timestamp/:id/:txID')
 	async timestampReport(@Param('id') id: number, @Param('txID') txID: string) {
+		console.log(id, txID)
 		return await this.reportsService.timestampReport(id, txID);
 	}
 }

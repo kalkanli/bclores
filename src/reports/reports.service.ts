@@ -14,10 +14,12 @@ export class ReportsService {
 	constructor(@InjectRepository(Report) private reportRepository: Repository<Report>) { }
 
 	public async processExcel(fileName, semester, instructor, course): Promise<void> {
-		const file = fs.readFileSync('../clores/2021-SPRING-CMPE230-clo-pc-data.xlsx');
-		const checksum = crypto.createHash('md5').update(file).digest("hex");
+		console.log(fileName)
+		
+		const file = fs.readFileSync('./uploads/' + fileName);
+		const checksum = crypto.createHash('sha256').update(file).digest("hex");
 		const report = new Report(
-			fileName,
+			'./uploads/' + fileName,
 			semester,
 			instructor,
 			course,
@@ -35,10 +37,10 @@ export class ReportsService {
 	public async getAllCollectiveCLOsAndPCs() {
 		let year = 2020;
 		const results = [];
-		
-		for(let i=0; i<3; i++) {
-			const result = await this.calculateCollectiveCLOsAndPCs(`${year}-${year+1}`);
-			if(result != null) {
+
+		for (let i = 0; i < 3; i++) {
+			const result = await this.calculateCollectiveCLOsAndPCs(`${year}-${year + 1}`);
+			if (result != null) {
 				results.push(result);
 			}
 			year++;
@@ -51,7 +53,7 @@ export class ReportsService {
 		const semesters = [`${tokens[0]}-FALL`, `${tokens[1]}-SPRING`];
 
 		const reports = await this.reportRepository.find({ where: { semester: In(semesters) } });
-		if(reports.length == 0) return null;
+		if (reports.length == 0) return null;
 
 		const PCPrefix = ["(1,9)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)", "(10)", "(11)"]
 		const PCs = Array.apply(null, Array(65)).map(() => []);
@@ -106,10 +108,10 @@ export class ReportsService {
 	public async createLatexReport(dto: CreateLatexDTO) {
 		let reportType = dto.type;
 		let filter = { semester: In(dto.semesters) }
-		if(dto.courses) {
+		if (dto.courses) {
 			filter['course'] = In(dto.courses);
 		}
-		const reports = await this.reportRepository.find({where: filter});
+		const reports = await this.reportRepository.find({ where: filter });
 		const reportIds = [];
 		let cloresFeed = [];
 		for (let i = 0; i < reports.length; i++) {
@@ -120,7 +122,7 @@ export class ReportsService {
 		const options = {
 			pythonPath: '../clores/env/bin/python3',
 			scriptPath: '../clores/src/',
-			args: [`--`+reportType, `--f1=${dto.semesters.join(',')}`, `--f2=${cloresFeed.join(',')}`]
+			args: [`--` + reportType, `--f1=${dto.semesters.join(',')}`, `--f2=${cloresFeed.join(',')}`]
 		}
 		if (reportType == 'cpc' || reportType == 'cclo') {
 			let years = [];
@@ -142,8 +144,8 @@ export class ReportsService {
 	}
 
 	public async timestampReport(id: number, txID: string): Promise<void> {
-		const report = await this.reportRepository.findOne({where: {id}});
-		report.status = 'certified';
+		const report = await this.reportRepository.findOne({ where: { id } });
+		report.status = 'timestamped';
 		report.txID = txID;
 		await this.reportRepository.save(report);
 	}
